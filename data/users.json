@@ -1,0 +1,23 @@
+[
+  {
+    "user_id": 1,
+    "username": "xiaohong",
+    "password": "e10adc3949ba59abbe56e057f20f883e",
+    "nickname": "勇敢的人先享受世界",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=头像"
+  },
+  {
+    "user_id": 2,
+    "username": "xiaobai",
+    "password": "e10adc3949ba59abbe56e057f20f883e",
+    "nickname": "小百科",
+    "avatar": "https://via.placeholder.com/40x40/4CAF50/ffffff?text=小"
+  },
+  {
+    "user_id": 3,
+    "username": "liu636",
+    "password": "96e79218965eb72c92a549dd5a330112",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1"
+  }
+]

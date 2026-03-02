@@ -1,0 +1,13 @@
+{
+  "likes": [],
+  "collects": [],
+  "comments": [
+    {
+      "user_id": 3,
+      "post_id": 1633,
+      "comment_id": 5,
+      "content": "很棒这个帖子",
+      "timestamp": "2026-01-13 22:01:42"
+    }
+  ]
+}

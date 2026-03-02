@@ -1,0 +1,123 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书 - 发现美好生活方式</title>
+    <link rel="stylesheet" href="/frontend/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">小红书</div>
+            <div class="search-box">
+                <i class="fas fa-search" id="searchIcon"></i>
+                <input id="searchInput" type="text" placeholder="搜索感兴趣的内容...">
+            </div>
+            <div class="user-actions">
+                <a href="/frontend/admin.html" id="adminEntry" class="admin-link hidden">Admin</a>
+                <div class="login-status">
+                    <span id="usernameDisplay" class="hidden"></span>
+                    <button id="registerBtn" class="register-btn">注册</button>
+                    <button id="loginBtn" class="login-btn">登录</button>
+                    <button id="logoutBtn" class="logout-btn hidden">登出</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="tag-tabs">
+        <div class="tag-scroll-container" id="tagContainer">
+            <button class="tag-btn active" data-tag="">推荐</button>
+            <button class="tag-btn" data-tag="美食">美食</button>
+            <button class="tag-btn" data-tag="穿搭">穿搭</button>
+            <button class="tag-btn" data-tag="旅行">旅行</button>
+            <button class="tag-btn" data-tag="学习">学习</button>
+            <button class="tag-btn" data-tag="生活">生活</button>
+            <button class="tag-btn" data-tag="护肤">护肤</button>
+            <button class="tag-btn" data-tag="运动">运动</button>
+        </div>
+    </div>
+
+    <main class="main-content">
+        <div class="posts-container" id="postsContainer">
+            <div class="loading">加载中...</div>
+        </div>
+        <div class="load-more">
+            <button id="loadMoreBtn">加载更多</button>
+        </div>
+    </main>
+
+    <div class="bottom-nav">
+        <a href="#" class="nav-link active">首页</a>
+    </div>
+
+    <div id="loginModal" class="modal login-modal">
+        <div class="modal-content login-modal-content">
+            <span class="close" data-close="loginModal">&times;</span>
+            <h2>登录</h2>
+            <form id="loginForm">
+                <div class="form-group"><input type="text" id="loginUsername" placeholder="用户名" required></div>
+                <div class="form-group"><input type="password" id="loginPassword" placeholder="密码" required></div>
+                <button type="submit" class="submit-btn">登录</button>
+                <p class="switch-form">还没有账号？<a href="#" id="showRegisterFromLogin">立即注册</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="registerModal" class="modal register-modal">
+        <div class="modal-content register-modal-content">
+            <span class="close" data-close="registerModal">&times;</span>
+            <h2>注册</h2>
+            <form id="registerForm">
+                <div class="form-group"><input type="text" id="registerUsername" placeholder="用户名" required></div>
+                <div class="form-group"><input type="text" id="registerNickname" placeholder="昵称" required></div>
+                <div class="form-group"><input type="password" id="registerPassword" placeholder="密码" required></div>
+                <div class="form-group"><input type="password" id="registerConfirmPassword" placeholder="确认密码" required></div>
+                <button type="submit" class="submit-btn">注册</button>
+                <p class="switch-form">已有账号？<a href="#" id="showLoginFromRegister">立即登录</a></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close" data-close="postModal">&times;</span>
+            <div class="modal-body">
+                <div class="modal-image-container"><img id="modalImage" src="" alt="帖子图片"></div>
+                <div class="modal-info">
+                    <div class="modal-author-info">
+                        <img id="modalAvatar" src="https://via.placeholder.com/40x40/ff2a68/ffffff?text=A" alt="作者头像" class="author-avatar">
+                        <div class="author-details">
+                            <h4 id="modalAuthorName">作者</h4>
+                            <span class="follow-btn">关注</span>
+                        </div>
+                    </div>
+                    <h3 id="modalTitle"></h3>
+                    <p id="modalContent"></p>
+                    <div class="modal-tags" id="modalTags"></div>
+                    <div class="post-stats">
+                        <div class="post-stats-item"><span class="interact-btn like-btn" id="modalLikeBtn"><i class="fas fa-heart"></i> <span id="modalLikeCount">0</span></span></div>
+                        <div class="post-stats-item"><span class="interact-btn collect-btn" id="modalCollectBtn"><i class="fas fa-bookmark"></i> <span id="modalCollectCount">0</span></span></div>
+                        <div class="post-stats-item"><span class="interact-btn comment-btn" id="modalCommentBtn"><i class="fas fa-comment"></i> <span id="modalCommentCount">0</span></span></div>
+                    </div>
+                </div>
+                <div class="comments-section">
+                    <h4>全部评论</h4>
+                    <div class="comment-input-area">
+                        <img id="commentUserAvatar" src="https://via.placeholder.com/30x30/ff2a68/ffffff?text=U" alt="用户头像" class="user-avatar">
+                        <div class="comment-input-container">
+                            <textarea id="commentInput" placeholder="请输入评论"></textarea>
+                            <button id="submitCommentBtn" class="submit-comment-btn">发送</button>
+                        </div>
+                    </div>
+                    <div class="comments-list" id="commentsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/frontend/script.js"></script>
+</body>
+</html>

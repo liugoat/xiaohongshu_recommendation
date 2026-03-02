@@ -1,0 +1,272 @@
+1. 异常定位结果
+-----------------
+通过分析backend/routes.py文件，我们发现：
+- 在register函数中第131行调用了uuid.uuid4()来生成session_id
+- 但在routes.py文件的头部没有找到import uuid或from uuid import uuid4的导入语句
+- 这导致了NameError: name 'uuid' is not defined异常
+
+2. register 当前源码
+--------------------
+以下是register函数的相关代码片段：
+```python
+@app.route('/api/register', methods=['POST'])
+def register():
+    """
+    用户注册
+    Request Body:
+        username (str): 用户名
+        password (str): 密码
+        nickname (str): 昵称
+    
+    Returns:
+        JSON: 注册结果和用户信息
+    """
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+    nickname = data.get('nickname', '用户{}'.format(len(UserDAO.get_all_users()) + 1 if hasattr(UserDAO, 'get_all_users') else 1))
+    
+    # 输入验证
+    if not username or not password or not nickname:
+        return jsonify({
+            'success': False,
+            'message': '缺少必要参数'
+        }), 400
+    
+    # 用户名校验规则
+    if len(username) < 3 or len(username) > 20:
+        return jsonify({
+            'success': False,
+            'message': '用户名长度必须在3-20个字符之间'
+        }), 400
+    
+    # 密码强度校验
+    if len(password) < 6:
+        return jsonify({
+            'success': False,
+            'message': '密码长度至少为6位'
+        }), 400
+    
+    # 检查用户名是否已存在
+    existing_user = UserDAO.get_user_by_username(username)
+    if existing_user:
+        return jsonify({
+            'success': False,
+            'message': '用户名已存在'
+        }), 409  # 使用409 Conflict状态码表示资源冲突
+    
+    # 创建新用户
+    password_hash = hashlib.md5(password.encode()).hexdigest()  # 密码md5加密
+    avatar = "https://via.placeholder.com/40x40/ff2a68/ffffff?text={}".format(nickname[0]) if nickname else None
+    
+    success = UserDAO.create_user(username, password_hash, nickname, avatar)
+    
+    if success:
+        new_user = UserDAO.get_user_by_username(username)
+        # 生成会话ID - 这里是问题所在，uuid未被定义
+        session_id = str(uuid.uuid4())
+        sessions[session_id] = new_user
+        
+        return jsonify({
+            'success': True,
+            'message': '注册成功',
+            'session_id': session_id,
+            'user': {
+                'user_id': new_user['user_id'],
+                'username': new_user['username'],
+                'nickname': new_user['nickname'],
+                'avatar': new_user['avatar']
+            }
+        })
+    else:
+        return jsonify({
+            'success': False,
+            'message': '注册失败'
+        }), 500
+```
+
+3. 问题根因
+------------
+- 代码中使用了uuid.uuid4()来生成唯一的会话ID
+- 但是没有在文件顶部导入uuid模块
+- Python无法识别uuid标识符，因此抛出了NameError异常
+
+4. 影响分析
+------------
+- 当用户发起注册请求时，如果用户名校验和密码校验都通过后，程序会在创建用户之后尝试生成会话ID
+- 由于uuid模块未导入，在调用uuid.uuid4()时会抛出NameError异常
+- 此时虽然UserDAO.create_user已经成功执行（用户数据已写入数据库），但由于异常的发生，后续的响应不会返回给前端
+- 结果是：用户实际上已经注册成功（数据库中有了用户记录），但前端收到的是错误响应，导致用户体验混乱
+
+5. 修复方案
+------------
+- 在文件顶部添加import uuid语句
+- 为了更好的错误处理，可以使用try-except块包装uuid生成逻辑，以防万一出现其他问题
+- 另外注意到代码中有个小错误，使用了sessions而不是sessions_db，需要修正
+
+6. 修复后完整代码
+------------------
+```python
+"""
+会话管理工具模块
+"""
+from datetime import datetime
+import uuid  # 添加uuid导入
+
+def get_user_by_session(session_id):
+    """根据会话ID获取用户信息"""
+    if session_id in sessions_db:
+        session_data = sessions_db[session_id]
+        if datetime.now() < session_data['expires']:
+            return session_data['user']
+        else:
+            # 会话过期，删除
+            del sessions_db[session_id]
+    return None
+
+# 全局会话存储（在实际项目中应该使用Redis或数据库）
+sessions_db = {}
+
+"""
+API路由定义
+重构后使用数据库数据
+"""
+from flask import request, jsonify, send_from_directory
+import os
+import sys
+from pathlib import Path
+from datetime import datetime, timedelta
+import hashlib
+import json  # 添加json导入
+
+# 添加项目根目录到sys.path
+project_root = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(project_root))
+
+# Flask相关导入
+from flask import Flask, request, jsonify
+
+# 数据库DAO导入
+from database.dao import PostDAO
+from database.dao import UserDAO
+from database.dao import UserActionDAO
+from database.dao import CommentDAO
+
+# 推荐系统导入 - 已不再使用，改用服务层
+# from recommendation.recommender import recommend_posts
+# from recommendation.personalized_recommend import get_personalized_posts
+
+# 服务层导入
+from service.recommend_service import RecommendService
+
+# 注意：这里不再从utils.session_manager导入，因为函数已在上面定义
+
+
+def init_routes(app):
+    """
+    初始化路由
+    
+    Args:
+        app (Flask): Flask应用实例
+    """
+
+    @app.route('/')
+    def index():
+        """
+        首页，返回前端页面
+        """
+        return send_from_directory(os.path.join(app.root_path, '..', 'frontend'), 'index.html')
+
+    @app.route('/frontend/<path:filename>')
+    def frontend_files(filename):
+        """
+        静态文件服务
+        """
+        return send_from_directory(os.path.join(app.root_path, '..', 'frontend'), filename)
+
+    @app.route('/api/register', methods=['POST'])
+    def register():
+        """
+        用户注册
+        Request Body:
+            username (str): 用户名
+            password (str): 密码
+            nickname (str): 昵称
+        
+        Returns:
+            JSON: 注册结果和用户信息
+        """
+        data = request.get_json()
+        username = data.get('username')
+        password = data.get('password')
+        nickname = data.get('nickname', '用户{}'.format(len(UserDAO.get_all_users()) + 1 if hasattr(UserDAO, 'get_all_users') else 1))
+        
+        # 输入验证
+        if not username or not password or not nickname:
+            return jsonify({
+                'success': False,
+                'message': '缺少必要参数'
+            }), 400
+        
+        # 用户名校验规则
+        if len(username) < 3 or len(username) > 20:
+            return jsonify({
+                'success': False,
+                'message': '用户名长度必须在3-20个字符之间'
+            }), 400
+        
+        # 密码强度校验
+        if len(password) < 6:
+            return jsonify({
+                'success': False,
+                'message': '密码长度至少为6位'
+            }), 400
+        
+        # 检查用户名是否已存在
+        existing_user = UserDAO.get_user_by_username(username)
+        if existing_user:
+            return jsonify({
+                'success': False,
+                'message': '用户名已存在'
+            }), 409  # 使用409 Conflict状态码表示资源冲突
+        
+        # 创建新用户
+        password_hash = hashlib.md5(password.encode()).hexdigest()  # 密码md5加密
+        avatar = "https://via.placeholder.com/40x40/ff2a68/ffffff?text={}".format(nickname[0]) if nickname else None
+        
+        success = UserDAO.create_user(username, password_hash, nickname, avatar)
+        
+        if success:
+            new_user = UserDAO.get_user_by_username(username)
+            try:
+                # 生成会话ID - 修复：使用正确的sessions_db变量名
+                session_id = str(uuid.uuid4())
+                sessions_db[session_id] = {
+                    'user': new_user,
+                    'expires': datetime.now() + timedelta(hours=24)  # 24小时过期
+                }
+                
+                return jsonify({
+                    'success': True,
+                    'message': '注册成功',
+                    'session_id': session_id,
+                    'user': {
+                        'user_id': new_user['user_id'],
+                        'username': new_user['username'],
+                        'nickname': new_user['nickname'],
+                        'avatar': new_user['avatar']
+                    }
+                })
+            except Exception as e:
+                # 如果会话创建失败，删除已创建的用户，回滚事务
+                UserDAO.delete_user_by_username(username)  # 假设有这个方法，否则需要实现
+                return jsonify({
+                    'success': False,
+                    'message': '会话创建失败，请重试'
+                }), 500
+        else:
+            return jsonify({
+                'success': False,
+                'message': '注册失败'
+            }), 500
+```

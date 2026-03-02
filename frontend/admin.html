@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推荐系统管理端</title>
+    <link rel="stylesheet" href="/frontend/admin.css">
+</head>
+<body>
+    <header class="topbar">
+        <h1>推荐系统管理端</h1>
+        <a class="back-link" href="/">返回前台</a>
+    </header>
+
+    <main class="layout">
+        <section class="panel">
+            <h2>1. 数据导入</h2>
+            <p class="hint">支持 JSON（{"posts":[...]}）或 CSV（title, content, tags, images, likes, comments, collects, publish_time）。</p>
+            <input id="importFile" type="file" accept=".json,.csv">
+            <textarea id="importJson" rows="8" placeholder='也可直接粘贴 JSON，例如 {"posts":[{"title":"xx","content":"yy","tags":["美食"]}]}'></textarea>
+            <button id="importBtn">执行导入</button>
+            <pre id="importResult" class="result"></pre>
+        </section>
+
+        <section class="panel">
+            <h2>2. 数据看板</h2>
+            <div class="actions">
+                <button id="refreshDashboardBtn">刷新看板</button>
+            </div>
+            <div class="grid-3">
+                <article>
+                    <h3>热门榜</h3>
+                    <div id="hotRank"></div>
+                </article>
+                <article>
+                    <h3>趋势</h3>
+                    <div id="trendBoard"></div>
+                </article>
+                <article>
+                    <h3>热门话题</h3>
+                    <div id="hotTopics"></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>3. 主题聚类（算法）</h2>
+            <div class="actions">
+                <button id="runClusterBtn">运行聚类</button>
+            </div>
+            <div id="clusterResult"></div>
+        </section>
+
+        <section class="panel">
+            <h2>4. 推荐</h2>
+            <div class="grid-2">
+                <article>
+                    <h3>个性化推荐</h3>
+                    <div class="inline">
+                        <input id="userIdInput" type="number" placeholder="user_id">
+                        <button id="loadPersonalizedBtn">查询</button>
+                    </div>
+                    <div id="personalizedResult"></div>
+                </article>
+                <article>
+                    <h3>相似笔记推荐</h3>
+                    <div class="inline">
+                        <input id="postIdInput" type="number" placeholder="post_id">
+                        <button id="loadSimilarBtn">查询</button>
+                    </div>
+                    <div id="similarResult"></div>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>5. AI 选题助手</h2>
+            <div class="actions">
+                <button id="runAssistantBtn">生成建议</button>
+            </div>
+            <div id="assistantResult"></div>
+        </section>
+
+        <section class="panel">
+            <h2>6. 评论情感分析 + 标签匹配审计</h2>
+            <div class="grid-2">
+                <article>
+                    <h3>情感分析</h3>
+                    <div class="inline">
+                        <input id="sentimentPostId" type="number" placeholder="可选 post_id">
+                        <button id="runSentimentBtn">分析</button>
+                    </div>
+                    <div id="sentimentResult"></div>
+                </article>
+                <article>
+                    <h3>标签匹配审计</h3>
+                    <div class="actions">
+                        <button id="runTagAuditBtn">执行审计</button>
+                    </div>
+                    <div id="tagAuditResult"></div>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <script src="/frontend/admin.js"></script>
+</body>
+</html>

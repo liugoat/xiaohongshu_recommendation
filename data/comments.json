@@ -1,0 +1,57 @@
+[
+  {
+    "comment_id": 1,
+    "post_id": 181,
+    "user_id": 3,
+    "username": "liu636",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1",
+    "content": "1122331",
+    "publish_time": "2025-12-28 14:43:45",
+    "likes": 0
+  },
+  {
+    "comment_id": 2,
+    "post_id": 181,
+    "user_id": 3,
+    "username": "liu636",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1",
+    "content": "111",
+    "publish_time": "2025-12-28 14:43:52",
+    "likes": 0
+  },
+  {
+    "comment_id": 3,
+    "post_id": 181,
+    "user_id": 3,
+    "username": "liu636",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1",
+    "content": "222",
+    "publish_time": "2025-12-28 14:46:49",
+    "likes": 0
+  },
+  {
+    "comment_id": 4,
+    "post_id": 181,
+    "user_id": 3,
+    "username": "liu636",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1",
+    "content": "ddd",
+    "publish_time": "2025-12-28 14:46:52",
+    "likes": 0
+  },
+  {
+    "comment_id": 5,
+    "post_id": 1633,
+    "user_id": 3,
+    "username": "liu636",
+    "nickname": "111",
+    "avatar": "https://via.placeholder.com/40x40/ff2a68/ffffff?text=1",
+    "content": "很棒这个帖子",
+    "publish_time": "2026-01-13 22:01:42",
+    "likes": 0
+  }
+]
